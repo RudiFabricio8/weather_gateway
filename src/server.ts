@@ -15,12 +15,18 @@ app.use((req: Request, res: Response, next: NextFunction): void => {
   next();
 });
 
+
+
 app.use(
   "/api/weather",
   createProxyMiddleware({
     target: DATA_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: { "^/api/weather": "/api/weather" },
     on: {
+      proxyReq: (proxyReq: any, req: any) => {
+        console.log(`[Proxy] Reenviando a: ${DATA_SERVICE_URL}${req.url}`);
+      },
       error: (err: Error, req: Request, res: any) => {
         console.error("[Proxy Error]", err.message);
         if (res.status) {
@@ -40,3 +46,4 @@ app.listen(PORT, () => {
   console.log(`[gateway] Proxy dirigiendo a: ${DATA_SERVICE_URL}`);
   console.log(`[gateway] CORS aceptando origen: ${CLIENT_ORIGIN}`);
 });
+
