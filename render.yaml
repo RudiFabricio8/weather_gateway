@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: gateway
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node dist/server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATA_SERVICE_URL
+        value: https://data-service-kltk.onrender.com
+        sync: false
+      - key: CLIENT_ORIGIN
+        value: "*"
