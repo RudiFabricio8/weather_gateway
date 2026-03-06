@@ -136,30 +136,6 @@ curl http://localhost:4000/health
 
 ---
 
-## 🔐 Variables de Entorno
-
-Crear archivo `.env` en la raíz de `gateway/`:
-
-```env
-PORT=3000
-DATA_SERVICE_URL=http://data-service:3001
-CLIENT_ORIGIN=http://localhost:5000
-```
-
-| Variable | Descripción | Requerido | Default |
-|----------|-------------|-----------|---------|
-| `PORT` | Puerto del gateway | No | 3000 |
-| `DATA_SERVICE_URL` | URL del data-service | No | http://localhost:3001 |
-| `CLIENT_ORIGIN` | Origen permitido por CORS | No | http://localhost:8080 |
-
-### Notas sobre Variables de Entorno
-
-- **DATA_SERVICE_URL**: En Docker usa el nombre del servicio (`http://data-service:3001`)
-- **CLIENT_ORIGIN**: Debe coincidir con el puerto del frontend
-- **PORT**: Puerto interno del contenedor (se mapea externamente en docker-compose.yml)
-
----
-
 ## 📝 Scripts Disponibles
 
 ```json
@@ -265,20 +241,6 @@ curl "http://localhost:4000/api/weather/current?city=Madrid"
 
 ---
 
-## 🐳 Docker
-
-### Dockerfile
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
 ### .dockerignore
 ```
 node_modules
@@ -366,19 +328,6 @@ app.use('/api/*', (req, res, next) => {
 });
 ```
 
-### Agregar rate limiting (ejemplo)
-
-```typescript
-import rateLimit from 'express-rate-limit';
-
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100 // máximo 100 peticiones
-});
-
-app.use('/api/', limiter);
-```
-
 ---
 
 ## 🔒 Seguridad
@@ -397,71 +346,3 @@ app.use('/api/', limiter);
 - [ ] Agregar validación de entrada
 
 ---
-
-## 📈 Mejoras Futuras
-
-- [ ] Agregar cache de respuestas
-- [ ] Implementar circuit breaker
-- [ ] Agregar métricas (Prometheus)
-- [ ] Implementar load balancing
-- [ ] Agregar tests de integración
-- [ ] Logging estructurado (Winston)
-
----
-
-## 🤝 Integración
-
-Este servicio se integra con:
-- **Frontend**: Recibe peticiones HTTP desde el navegador
-- **Data-service**: Hace proxy de peticiones hacia el backend
-
-**Beneficios del Gateway:**
-- Punto de entrada único
-- Desacoplamiento entre frontend y backend
-- Facilita cambios en la arquitectura backend
-- Centraliza seguridad y logging
-
----
-
-## 👨‍💻 Mantenimiento
-
-### Actualizar dependencias
-```bash
-npm update
-```
-
-### Verificar vulnerabilidades
-```bash
-npm audit
-npm audit fix
-```
-
-### Recompilar después de cambios
-```bash
-npm run build
-```
-
-### Ver logs en Docker
-```bash
-docker logs api_terceros-gateway-1 -f
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Error: CORS blocked
-**Problema:** Frontend no puede hacer peticiones  
-**Solución:** Verificar que `CLIENT_ORIGIN` coincida con el puerto del frontend
-
-### Error: 503 Service Unavailable
-**Problema:** Gateway no puede comunicarse con data-service  
-**Solución:** Verificar que data-service esté corriendo y `DATA_SERVICE_URL` sea correcta
-
-### Error: Cannot GET /api/weather/current
-**Problema:** Ruta incorrecta en el proxy  
-**Solución:** Verificar configuración de `createProxyMiddleware`
-
----
-
-**Gateway - Parte del proyecto WeatherSOA** 🔀
